@@ -1,0 +1,115 @@
+################################################################################################################################
+Octoprint:
+
+After printjob is cancelled:
+;Moce first Z up a bit
+G0 F1000 Z20
+M84 ; disable motors
+;disable all heaters
+{% snippet 'disable_hotends' %}
+{% snippet 'disable_bed' %}
+M106 S0 ;disable fan
+
+
+
+
+
+After print job is paused:
+
+M83 ; relative extruder moves
+G1 E-5 F3600 ; retract 5mm of filament
+G91 ; relative positioning
+G1 Z5 F360 ; lift Z by 5mm
+G90 ; absolute positioning
+G1 X0 Y0 F6000 ; go to X=0 Y=0
+M104 S0 ;Turn off extruder
+;M140 S0 ;Turn off the bed
+
+
+
+
+After print job is resumed:
+
+{% if pause_temperature[0] and pause_temperature[0]['target'] is not none %}
+    M109 S{{ pause_temperature[0]['target'] }}
+{% else %}
+    M104 S0
+{% endif %}
+
+{% if pause_temperature['b'] and pause_temperature['b']['target'] is not none %}
+    M190 S{{ pause_temperature['b']['target'] }}
+{% else %}
+    M140 S0
+{% endif %}
+
+M83 ; relative extruder moves
+G1 E5 F3600 ; extrude 5mm of filament
+M82 ; Absolute the Extruder
+G90 ; absolute the xyz
+; Reset extruder
+G92 E{{ pause_position.e }}
+; Relocate to the xyz
+G1 X{{ pause_position.x }} Y{{ pause_position.y }} Z{{ pause_position.z }} F4500
+
+################################################################################################################################
+
+CURA:
+
+Start G-code:
+
+G92 E0 ; Reset Extruder
+M104 S170 ; start heating to non sticking temp on hotend
+M140 S{first_layer_bed_temperature} ; start heating the bed to what is set in Cura
+M109 R170 ; Wait for hotend temp
+M190 T0 S{material_bed_temperature} ;wait for bed temperature
+G34 ;Gantry levelling
+G28 ;Home
+G29 ;Bed levelling
+M104 S{first_layer_temperature} T0 ; start heating T0 to what is set in Cura
+M109 T0 S{material_print_temperature} ;wait for hotend temperature
+M190 T0 S{material_bed_temperature} ;wait for bed temperature
+G92 E0 ; Reset Extruder
+G1 X0.1 Y20 Z0.3 F5000.0 ; Move to start position
+G1 X0.1 Y200.0 Z0.3 F1500.0 E15 ; Draw the first line
+G1 X0.4 Y200.0 Z0.3 F5000.0 ; Move to side a little
+G1 X0.4 Y20 Z0.3 F1500.0 E30 ; Draw the second line
+G92 E0 ; Reset Extruder
+G1 Z2.0 F3000 ; Move Z Axis up little to prevent scratching of Heat Bed
+G1 X5 Y20 Z0.3 F5000.0 ; Move over to prevent blob squish
+G92 E0 ; Reset Extruder
+
+
+
+End G-code:
+
+M104 S0 ; turn off the hotend
+M140 S0 ; turn off the bed
+G92 E0 ; reset extruder
+G1 E-0.2 F2000 ; retract filament
+G1 X0 Y220 F3000 ; move bed
+M107 ; part fan off
+M84 ; Disable Motors
+
+
+
+Printer settings:
+X = 220
+Y = 205
+Z = 220
+Build plate = rectangular
+Origin at center = no
+Heated bed = yes
+Heated bed volume = no
+G-code flavor = Marlin
+
+
+Printhead Settings:
+X min = -27.5
+Y min = -30
+X max = 27.5
+Y max = 30
+Gantry Height = 25
+Number of extruders = 1
+
+
+################################################################################################################################

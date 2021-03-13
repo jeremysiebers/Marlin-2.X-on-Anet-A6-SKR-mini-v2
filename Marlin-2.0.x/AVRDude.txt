@@ -1,0 +1,1 @@
+avrdude -c usbtiny -P USBtiny -p m1284p -U flash:w:firmware.hex

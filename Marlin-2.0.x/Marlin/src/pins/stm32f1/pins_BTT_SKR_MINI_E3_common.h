@@ -131,17 +131,17 @@
 
 #if HAS_WIRED_LCD
 
-  #if ENABLED(CR10_STOCKDISPLAY)
+  #if ENABLED(CR10_STOCKDISPLAY) // THIS ONE IS MODIFIED TO MATCH ANET A6 LCD!!!!!!!
 
     #define BEEPER_PIN                      PB5
-    #define BTN_ENC                       EXP1_9
+    #define BTN_ENC                         PA9
 
-    #define BTN_EN1                         PA9
-    #define BTN_EN2                         PA10
+    #define BTN_EN1                         PA10
+    #define BTN_EN2                         PB8
 
-    #define LCD_PINS_RS                     PB8
-    #define LCD_PINS_ENABLE               EXP1_3
-    #define LCD_PINS_D4                     PB9
+    #define LCD_PINS_RS                     EXP1_3
+    #define LCD_PINS_ENABLE                 PB9
+    #define LCD_PINS_D4                     EXP1_9
 
   #elif ENABLED(ZONESTAR_LCD)                     // ANET A8 LCD Controller - Must convert to 3.3V - CONNECTING TO 5V WILL DAMAGE THE BOARD!
 
